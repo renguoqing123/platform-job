@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: platform-job
+  cloud:
+      config:
+        uri: http://${config.server.url}:${config.server.port:7777}/
+        profile: ${profile:local}
+        label: master
+        username: ${configuser:configreader}
+        password: ${configpassword:06791900-2715-409e-85b4-2daf5fa535b5}
