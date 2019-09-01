@@ -11,17 +11,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
-  freemarker:
-    charset: UTF-8
-    request-context-attribute: request
-    settings:
-      number_format: 0.##########
-    suffix: .ftl
-    templateLoaderPath: classpath:/templates/
-  mvc:
-    static-path-pattern: /static/**
-  resources:
-    static-locations: classpath:/static/
 eureka:
   instance:
     prefer-ip-address: true

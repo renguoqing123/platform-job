@@ -1,6 +1,7 @@
 package com.platform.job.dao;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -21,4 +22,21 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 	
 	@Query(value = "SELECT ID FROM SX_TRIGGERS WHERE JOB_NAME=?1 ", nativeQuery = true)
 	public Long findOne(String jobName);
+	
+	@Query(value = "SELECT JOB_NAME FROM SX_TRIGGERS WHERE JOB_GROUP=?1 ", nativeQuery = true)
+	public List<String> findJobByGroupNameList(String groupName);
+	
+	@Query(value = "SELECT DISTINCT JOB_GROUP FROM SX_TRIGGERS ", nativeQuery = true)
+	public List<String> findDistinctGroupList();
+	
+	@Query(value = "SELECT DISTINCT JOB_NAME FROM SX_TRIGGERS ", nativeQuery = true)
+	public List<String> findDistinctJobList();
+	
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,DESCRIPTION,CRON_EXPRESSION,REQUEST_URL,REQUEST_BODY,REMARK,CREATE_USER,CREATE_DATE,MODIFY_USER,MODIFY_DATE "
+			+ "FROM SX_TRIGGERS WHERE JOB_GROUP=?1", nativeQuery = true)
+	public List<String> findByGroupList(String groupName);
+	
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,DESCRIPTION,CRON_EXPRESSION,REQUEST_URL,REQUEST_BODY,REMARK,CREATE_USER,CREATE_DATE,MODIFY_USER,MODIFY_DATE "
+			+ "FROM SX_TRIGGERS WHERE JOB_NAME=?1", nativeQuery = true)
+	public List<String> findByJobList(String jobName);
 }

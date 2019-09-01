@@ -31,16 +31,17 @@
   		<thead>
 	   		<tr>
 	   		   <td>
-	   		   	 任务名：<input class="changeDiv" type="text" id="textDbSelect" list="dbListForSelect" onchange="gradeChange()"/>
+	   		   	group组名：<input class="changeDiv" type="text" id="textDbSelect" list="dbListForSelect" onChange="gradeChange()"/>
 	                <datalist id="dbListForSelect">
 	                 </datalist>
 	   		   </td>
 	   		   <td>
-	   		   	 组名：<input class="changeDiv" type="text" id="textTableSelect" list="dataListForSelect" onchange="gradeTableChange()"/>
+	   		   	 job任务名：<input class="changeDiv" type="text" id="textTableSelect" list="dataListForSelect" onChange="gradeTableChange()"/>
 	                <datalist id="dataListForSelect">
 	                 </datalist>
 	   		   </td>
-	   		   <td><input type="button" onclick="searchTable(1,10)" value="查询"></input></td>
+	   		   <td><input type="button" onClick="searchTable(1,10)" value="查询"></input></td>
+	   		   <td><input type="button" onClick="searchTable(1,10)" value="添加"></input></td>
 	   		</tr>
 	   	</thead>
   	</table>
@@ -53,13 +54,13 @@
    	</table>
    	<div id="fenye" style="display: none;">
    		<tr>
-   			<td><input type="button" value="首页" onclick="page(1)"/></td>
-   			<td><input type="button" value="上一页" onclick="page(2)"/></td>
+   			<td><input type="button" value="首页" onClick="page(1)"/></td>
+   			<td><input type="button" value="上一页" onClick="page(2)"/></td>
    			<td>第<span id="pageNum"></span>页</td>
-   			<td><input type="button" value="下一页" onclick="page(3)"/></td>
-   			<td><input type="button" value="尾页" onclick="page(4)"/></td>
+   			<td><input type="button" value="下一页" onClick="page(3)"/></td>
+   			<td><input type="button" value="尾页" onClick="page(4)"/></td>
    			<td><input id="tz" type="text" value=""/></td>
-   			<td><input type="button" value="跳转" onclick="page(5)"/></td>
+   			<td><input type="button" value="跳转" onClick="page(5)"/></td>
    			<td>总页数:<span id="total"></span></td>
    			<td>条数:<input class="changeDiv" size="2" type="text" value="10" id="textNumSelect" list="dataNumListForSelect" />
 	                <datalist id="dataNumListForSelect">
@@ -83,7 +84,7 @@
   
   window.onload=function(){}
   
-  $.get("/queryDbList",function(data,status){
+  $.get("/getDistinctGroupList",function(data,status){
 	  var optionstring="";
 	  $.each(data,function(key,value){
 		  optionstring += "<option value=\"" + value + "\" ></option>";  
@@ -93,10 +94,10 @@
   
   function gradeChange(){
 	  var db = $("#textDbSelect").val();
-	  $.get("/queryTableList/"+db+"",function(data,status){
+	  $.get("/getJobByGroupNameList?groupName="+db+"",function(data,status){
 		  var optionstring="";  
 		  $.each(data,function(key,value){
-			  optionstring += "<option value=\"" + key + "\" >"+value+"</option>";  
+			  optionstring += "<option value=\"" + value + "\" ></option>";  
 		  })
 		  $("#textTableSelect").val("");
 		  $("#dataListForSelect").html(optionstring); 

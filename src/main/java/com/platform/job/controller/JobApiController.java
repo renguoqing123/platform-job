@@ -1,6 +1,7 @@
 package com.platform.job.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -183,6 +184,24 @@ public class JobApiController {
         }
         log.info(">>>>>>>>>>> stopJob success, triggerKey:{}", triggerKey);
         return true;
+    }
+	
+	@RequestMapping(value = "/getDistinctJobList", method = RequestMethod.GET)
+	public List<String> getDistinctJobList() {
+		List<String> groupList = sxTriggersDao.findDistinctJobList();
+        return groupList;
+    }
+	
+	@RequestMapping(value = "/getDistinctGroupList", method = RequestMethod.GET)
+	public List<String> getDistinctGroupList() {
+		List<String> groupList = sxTriggersDao.findDistinctGroupList();
+        return groupList;
+    }
+	
+	@RequestMapping(value = "/getJobByGroupNameList", method = RequestMethod.GET)
+	public List<String> getJobByGroupNameList(@RequestParam String groupName) {
+		List<String> jobList = sxTriggersDao.findJobByGroupNameList(groupName);
+        return jobList;
     }
 	
 }
