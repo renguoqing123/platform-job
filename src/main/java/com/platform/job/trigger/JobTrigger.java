@@ -1,6 +1,5 @@
 package com.platform.job.trigger;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.extern.slf4j.Slf4j;
