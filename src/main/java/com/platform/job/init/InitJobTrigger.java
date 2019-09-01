@@ -2,7 +2,6 @@ package com.platform.job.init;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -15,6 +14,7 @@ import org.quartz.TriggerKey;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 
 import com.platform.job.bean.SxTriggersDO;
 import com.platform.job.constants.Param;
