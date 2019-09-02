@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
   <title>主页</title>
+  <link type="text/css" href="../css/style.css" rel="stylesheet" />
   <style type="text/css">
   		th {
             text-align: left;
@@ -21,7 +22,6 @@
 			visibility : hidden;
 			position : absolute;
 		}
-
   </style>
 </head>
 <body>
@@ -41,7 +41,7 @@
 	                 </datalist>
 	   		   </td>
 	   		   <td><input type="button" onClick="searchTable(1,10)" value="查询"></input></td>
-	   		   <td><input type="button" onClick="searchTable(1,10)" value="添加"></input></td>
+	   		   <td><input type="button" onClick="addjob()" value="添加"></input></td>
 	   		</tr>
 	   	</thead>
   	</table>
@@ -79,10 +79,36 @@
 	 </ul>
 	</div>
   </div>
+  
+
+	<div id="job" style="display: none;"> 
+	<h2><img src="" alt="" class="close" />添加job任务</h2> 
+	<form id="jobForm" > 
+	<div class="info"></div> 
+	<div class="job">任务名：<input type="text" name="user" class="text" /></div> 
+	<div class="group">任务组：<input type="text" name="pass" class="text" /></div> 
+	<div class="url">请求地址：<input type="text" name="requestUrl" class="text" /></div>
+	<div class="body">请求内容：<input type="text" name="requestBody" class="text" /></div>
+	<div class="cron">表达式：<input type="text" name="ca" class="text" /></div> 
+	<div class="desc">描述：<input type="text" name="description" class="text" /></div> 
+	<div class="button"><input type="button" name="sub" class="submit" value="确认" /></div> 
+	</form> 
+	</div> 
+
   <script type="text/javascript" src="../js/jquery/1.9.1/jquery.min.js"></script>
   <script type="text/javascript">
   
   window.onload=function(){}
+  
+  $(document).ready(function() { 
+	jQuery.fn.extend({center:function(width,height){ 
+		  return $(this).css("left", ($(window).width()-width)/2+$(window).scrollLeft()). 
+		  css("top", ($(window).height()-height)/2+$(window).scrollTop()). 
+		  css("width",width). 
+		  css("height",height); 
+		  } 
+	}); 
+  }); 
   
   $.get("/getDistinctGroupList",function(data,status){
 	  var optionstring="";
@@ -104,10 +130,15 @@
 	  });
   }
   
+  function addjob(){
+	 // window.open('addeEject.html',"newwindow", "height=100, width=400, top=50%, left=50%, toolbar=no,menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+	  $("#job").show().center(450,350);//展现登陆框                                           
+  }
+  
   function gradeTableChange(){
 	  var db = $("#textDbSelect").val();
 	  var table = $("#textTableSelect").val();
-	  var valueParam="/queryTableParamList/"+db+"/"+table;
+	  var valueParam="/jobTableParamList/"+db+"/"+table;
 	  $.get(valueParam, function(data,status){
 		  var paramValue="";
 		  $.each(data,function(key,value){
@@ -118,44 +149,6 @@
 		  $("#dataSortListForSelect").html("");
 		  $("#dataSortListForSelect").html(paramValue);
 	  });
-  }
-  
-  function searchMoreTable(pageNum,pageSize){
-	  var condition = $("#condition").val();
-	  var db = $("#textDbSelect").val();
-	  var table = $("#textTableSelect").val();
-	  if(''==condition){
-		  alert("请输入sql语句");
-		  return;
-	  }
-	  if('' == db){
-		  alert("请选择表对象的数据源DB");
-		  return;
-	  }
-	  if('' == table){
-		  alert("表任意选择");
-		  return;
-	  }
-	  condition = condition.toUpperCase();
-	  var select_index = condition.lastIndexOf("SELECT");
-	  var from_index = condition.indexOf("FROM");
-	  var param = condition.substring(select_index,from_index);
-	  param = param.split("SELECT")[1].trim();
-	  var data = param.split(",");
-	  var paramValue="";
-	  var optionSortString="";  
-	  $.each(data,function(key,value){
-		  if(null!=value){
-			  paramValue += "<th id='drawing' ondblclick='shuangji("+key+")' oncontextmenu=''>"+value+"</th>";
-			  optionSortString += "<option value=\"" + value + "\" ></option>";
-		  }
-	  })
-	  $("#paramValue").html(paramValue);
-	  $("#dataSortListForSelect").html(optionSortString); 
-	  var db = $("#textDbSelect").val();
-	  var table = $("#textTableSelect").val();
-	  pageSize = $("#textNumSelect").val();
-	  handleTable(db,table,pageNum,pageSize,condition);
   }
   
   function searchTable(pageNum,pageSize){
@@ -170,7 +163,7 @@
 		  alert("表名不能为空");
 		  return;
 	  }
-	  var valueParam="/queryTableParamList/"+db+"/"+table;
+	  var valueParam="/jobTableParamList/"+db+"/"+table;
 	  
 	  $.get(valueParam, function(data,status){
 		  var paramValue="";
@@ -184,21 +177,13 @@
 		  $("#paramValue").html(paramValue);
 		  $("#dataSortListForSelect").html(optionSortString); 
 	  });
-	  var condition = $("#condition").val();
-	  handleTable(db,table,pageNum,pageSize,condition);
+	  handleTable(db,table,pageNum,pageSize);
   }
   
-  function handleTable(db,table,pageNum,pageSize,condition){
-	  var param = "/queryTable/"+db+"/"+table+"";
+  function handleTable(db,table,pageNum,pageSize){
+	  var param = "/queryJobTable/"+db+"/"+table+"";
 	  var sort = $('#textSortSelect').val();
-	  if('' != condition){
-		  param = param + "?condition="+condition+"&pageNum="+pageNum+"&pageSize="+pageSize;
-	  }else{
-		  param = param + "?pageNum="+pageNum+"&pageSize="+pageSize;
-	  }
-	  if('' != sort){
-		  param = param + "&sort="+sort
-	  }
+	  param = param + "?pageNum="+pageNum+"&pageSize="+pageSize+"&sort=1";
 	  
 	  $.get(param, function(data,status){
 		  var code = data.respCode;

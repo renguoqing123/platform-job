@@ -2,6 +2,7 @@ package com.platform.job.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -13,16 +14,20 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Lists;
 import com.platform.job.bean.SxTriggersDO;
 import com.platform.job.constants.Param;
 import com.platform.job.core.MyJob;
 import com.platform.job.dao.SxTriggersDao;
 import com.platform.job.scheduler.JobScheduler;
+import com.platform.job.util.ResponseResult;
+import com.platform.job.util.ResultPage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -203,5 +208,39 @@ public class JobApiController {
 		List<String> jobList = sxTriggersDao.findJobByGroupNameList(groupName);
         return jobList;
     }
+	
+	@RequestMapping(value = "/queryJobTable/{jobName}/{groupName}", method = RequestMethod.GET)
+	public ResponseResult<ResultPage<List<SxTriggersDO>>> queryTable(@PathVariable("jobName") String jobName,@PathVariable("groupName") String groupName,
+			@RequestParam Integer pageNum, @RequestParam Integer pageSize,@RequestParam(value = "sort", required = false) String sort){
+		List<SxTriggersDO> list = Lists.newArrayListWithCapacity(10);
+		if(null!=jobName && null!=groupName) {
+			list = sxTriggersDao.findByJobList(jobName, groupName,pageNum,pageSize);
+		}else if(null!=jobName) {
+			list = sxTriggersDao.findByJobList(jobName,pageNum,pageSize);
+		}else if(null!=groupName) {
+			list = sxTriggersDao.findByGroupList(jobName,pageNum,pageSize);
+		}
+		ResultPage<List<SxTriggersDO>> resPage = new ResultPage<>();
+		resPage.setData(list);
+		ResponseResult<ResultPage<List<SxTriggersDO>>> result = new ResponseResult<>();
+		result.setData(resPage);
+		return result;
+	}
+	
+	@RequestMapping(value = "/jobTableParamList/{jobName}/{groupName}", method = RequestMethod.GET)
+	public List<String> queryTableParamList(@PathVariable("jobName") String jobName,@PathVariable("groupName") String groupName){
+		List<String> list = Lists.newArrayListWithCapacity(0);
+		list.add("主键");
+		list.add("任务名");
+		list.add("任务组");
+		list.add("请求地址");
+		list.add("请求参数");
+		list.add("任务描述");
+		list.add("备注");
+		list.add("创建人");
+		list.add("创建时间");
+		return list;
+	}
+	
 	
 }
