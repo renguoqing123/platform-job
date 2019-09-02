@@ -31,12 +31,12 @@
   		<thead>
 	   		<tr>
 	   		   <td>
-	   		   	group组名：<input class="changeDiv" type="text" id="textDbSelect" list="dbListForSelect" onChange="gradeChange()"/>
+	   		   	group组名：<input class="changeDiv" type="text" id="textGroupSelect" list="dbListForSelect" onChange="gradeChange()"/>
 	                <datalist id="dbListForSelect">
 	                 </datalist>
 	   		   </td>
 	   		   <td>
-	   		   	 job任务名：<input class="changeDiv" type="text" id="textTableSelect" list="dataListForSelect" onChange="gradeTableChange()"/>
+	   		   	 job任务名：<input class="changeDiv" type="text" id="textJobSelect" list="dataListForSelect" onChange="gradeTableChange()"/>
 	                <datalist id="dataListForSelect">
 	                 </datalist>
 	   		   </td>
@@ -119,13 +119,13 @@
   });
   
   function gradeChange(){
-	  var db = $("#textDbSelect").val();
+	  var db = $("#textGroupSelect").val();
 	  $.get("/getJobByGroupNameList?groupName="+db+"",function(data,status){
 		  var optionstring="";  
 		  $.each(data,function(key,value){
 			  optionstring += "<option value=\"" + value + "\" ></option>";  
 		  })
-		  $("#textTableSelect").val("");
+		  $("#textJobSelect").val("");
 		  $("#dataListForSelect").html(optionstring); 
 	  });
   }
@@ -136,8 +136,8 @@
   }
   
   function gradeTableChange(){
-	  var db = $("#textDbSelect").val();
-	  var table = $("#textTableSelect").val();
+	  var db = $("#textGroupSelect").val();
+	  var table = $("#textJobSelect").val();
 	  var valueParam="/jobTableParamList/"+db+"/"+table;
 	  $.get(valueParam, function(data,status){
 		  var paramValue="";
@@ -152,18 +152,10 @@
   }
   
   function searchTable(pageNum,pageSize){
-	  var db = $("#textDbSelect").val();
-	  var table = $("#textTableSelect").val();
+	  var groupName = $("#textGroupSelect").val();
+	  var jobName = $("#textJobSelect").val();
 	  pageSize = $("#textNumSelect").val();
-	  if('' == db){
-		  alert("db不能为空");
-		  return;
-	  }
-	  if('' == table){
-		  alert("表名不能为空");
-		  return;
-	  }
-	  var valueParam="/jobTableParamList/"+db+"/"+table;
+	  var valueParam="/jobTableParamList";
 	  
 	  $.get(valueParam, function(data,status){
 		  var paramValue="";
@@ -177,13 +169,13 @@
 		  $("#paramValue").html(paramValue);
 		  $("#dataSortListForSelect").html(optionSortString); 
 	  });
-	  handleTable(db,table,pageNum,pageSize);
+	  handleTable(jobName,groupName,pageNum,pageSize);
   }
   
-  function handleTable(db,table,pageNum,pageSize){
-	  var param = "/queryJobTable/"+db+"/"+table+"";
+  function handleTable(jobName,groupName,pageNum,pageSize){
+	  var param = "/queryJobTable";
 	  var sort = $('#textSortSelect').val();
-	  param = param + "?pageNum="+pageNum+"&pageSize="+pageSize+"&sort=1";
+	  param = param +"?jobName="+jobName+"&groupName="+groupName+"&pageNum="+pageNum+"&pageSize="+pageSize+"&sort=1";
 	  
 	  $.get(param, function(data,status){
 		  var code = data.respCode;
@@ -213,6 +205,7 @@
 				  }
 				   
 			  })
+			  data += "<td><input type='button' onClick='addjob()' value='修改'></input><input type='button' onClick='addjob()' value='删除'></input></td>";
 			  data += "<tr>"; 
 			  pdata += data;
 		  })
@@ -276,10 +269,10 @@
   }
   
   function searchExportTable(){
-	  var db = $("#textDbSelect").val();
+	  var db = $("#textGroupSelect").val();
 	  var condition = $("#condition").val();
 	  condition = condition.toUpperCase();
-	  var table = $("#textTableSelect").val();
+	  var table = $("#textJobSelect").val();
 	  var param = "/exportTable/"+db+"/"+table+"";
 	  var sort = $('#textSortSelect').val();
 	  if('' != condition){

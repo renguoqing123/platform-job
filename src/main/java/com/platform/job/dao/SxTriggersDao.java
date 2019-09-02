@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,15 +35,19 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 	@Query(value = "SELECT DISTINCT JOB_NAME FROM SX_TRIGGERS ", nativeQuery = true)
 	public List<String> findDistinctJobList();
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,DESCRIPTION,CRON_EXPRESSION,REQUEST_URL,REQUEST_BODY,REMARK,CREATE_USER,CREATE_DATE,MODIFY_USER,MODIFY_DATE "
-			+ "FROM SX_TRIGGERS WHERE JOB_GROUP=?1 ORDER BY CREATE_DATE DESC LIMIT :pageNum,:pageSize", nativeQuery = true)
-	public List<SxTriggersDO> findByGroupList(String groupName,@Param("pageNum") Integer pageNum,@Param("pageSize") Integer pageSize);
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+			+ "FROM SX_TRIGGERS WHERE JOB_GROUP=:groupName ORDER BY CREATE_DATE DESC", nativeQuery = true)
+	public Page<Object[]> findByGroupList(@Param("groupName") String groupName,Pageable pageable);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,DESCRIPTION,CRON_EXPRESSION,REQUEST_URL,REQUEST_BODY,REMARK,CREATE_USER,CREATE_DATE,MODIFY_USER,MODIFY_DATE "
-			+ "FROM SX_TRIGGERS WHERE JOB_NAME=?1 ORDER BY CREATE_DATE DESC LIMIT pageNum=?2,pageSize=?3", nativeQuery = true)
-	public List<SxTriggersDO> findByJobList(String jobName,Integer pageNum,Integer pageSize);
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+			+ "FROM SX_TRIGGERS WHERE JOB_NAME=:jobName ORDER BY CREATE_DATE DESC", nativeQuery = true)
+	public Page<Object[]> findByJobList(@Param("jobName") String jobName,Pageable pageable);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,DESCRIPTION,CRON_EXPRESSION,REQUEST_URL,REQUEST_BODY,REMARK,CREATE_USER,CREATE_DATE,MODIFY_USER,MODIFY_DATE "
-			+ "FROM SX_TRIGGERS WHERE JOB_NAME=?1 AND GROUP_NAME=?2 ORDER BY CREATE_DATE DESC LIMIT pageNum=?3,pageSize=?4", nativeQuery = true)
-	public List<SxTriggersDO> findByJobList(String jobName,String groupName,Integer pageNum,Integer pageSize);
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+			+ "FROM SX_TRIGGERS WHERE JOB_NAME=:jobName AND JOB_GROUP=:groupName ORDER BY CREATE_DATE DESC", nativeQuery = true)
+	public Page<Object[]> findByJobList(@Param("jobName") String jobName,@Param("groupName") String groupName,Pageable pageable);
+	
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+			+ "FROM SX_TRIGGERS ORDER BY CREATE_DATE DESC", nativeQuery = true)
+	public Page<Object[]> findByJobList(Pageable pageable);
 }

@@ -14,6 +14,13 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -209,36 +216,52 @@ public class JobApiController {
         return jobList;
     }
 	
-	@RequestMapping(value = "/queryJobTable/{jobName}/{groupName}", method = RequestMethod.GET)
-	public ResponseResult<ResultPage<List<SxTriggersDO>>> queryTable(@PathVariable("jobName") String jobName,@PathVariable("groupName") String groupName,
+	@RequestMapping(value = "/queryJobTable", method = RequestMethod.GET)
+	public ResponseResult<ResultPage<List<Object[]>>> queryTable(@RequestParam(value="jobName", required = false) String jobName,@RequestParam(value="groupName",required = false) String groupName,
 			@RequestParam Integer pageNum, @RequestParam Integer pageSize,@RequestParam(value = "sort", required = false) String sort){
-		List<SxTriggersDO> list = Lists.newArrayListWithCapacity(10);
-		if(null!=jobName && null!=groupName) {
-			list = sxTriggersDao.findByJobList(jobName, groupName,pageNum,pageSize);
-		}else if(null!=jobName) {
-			list = sxTriggersDao.findByJobList(jobName,pageNum,pageSize);
-		}else if(null!=groupName) {
-			list = sxTriggersDao.findByGroupList(jobName,pageNum,pageSize);
+		List<Object[]> li = Lists.newArrayListWithCapacity(10);
+		Page<Object[]> list = null;
+//		SxTriggersDO dto=new SxTriggersDO();
+//		dto.setJOB_NAME(jobName);
+//		dto.setJOB_GROUP(groupName);
+//		ExampleMatcher matcher = ExampleMatcher.matching();
+//		Example<SxTriggersDO> ex = Example.of(dto, matcher); 
+		Pageable pageable = PageRequest.of(pageNum-1, pageSize);
+		if(!StringUtils.isEmpty(jobName) && !StringUtils.isEmpty(groupName)) {
+//			list = sxTriggersDao.findAll(ex,pageable);
+			list = sxTriggersDao.findByJobList(jobName,groupName,pageable);
+			li = list.getContent();
+		}else if(!StringUtils.isEmpty(jobName)) {
+			list = sxTriggersDao.findByJobList(jobName,pageable);
+			li = list.getContent();
+		}else if(!StringUtils.isEmpty(groupName)) {
+			list = sxTriggersDao.findByGroupList(groupName,pageable);
+			li = list.getContent();
+		}else {
+			list = sxTriggersDao.findByJobList(pageable);
+			li = list.getContent();
 		}
-		ResultPage<List<SxTriggersDO>> resPage = new ResultPage<>();
-		resPage.setData(list);
-		ResponseResult<ResultPage<List<SxTriggersDO>>> result = new ResponseResult<>();
+		ResultPage<List<Object[]>> resPage = new ResultPage<>();
+		resPage.setData(li);
+		ResponseResult<ResultPage<List<Object[]>>> result = new ResponseResult<>();
 		result.setData(resPage);
 		return result;
 	}
 	
-	@RequestMapping(value = "/jobTableParamList/{jobName}/{groupName}", method = RequestMethod.GET)
-	public List<String> queryTableParamList(@PathVariable("jobName") String jobName,@PathVariable("groupName") String groupName){
+	@RequestMapping(value = "/jobTableParamList", method = RequestMethod.GET)
+	public List<String> queryTableParamList(){
 		List<String> list = Lists.newArrayListWithCapacity(0);
 		list.add("主键");
 		list.add("任务名");
 		list.add("任务组");
 		list.add("请求地址");
 		list.add("请求参数");
+		list.add("表达式");
 		list.add("任务描述");
 		list.add("备注");
 		list.add("创建人");
 		list.add("创建时间");
+		list.add("操作");
 		return list;
 	}
 	
