@@ -1,5 +1,6 @@
 package com.platform.job.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -248,7 +249,7 @@ public class JobApiController {
 	@RequestMapping(value = "/queryJobTable", method = RequestMethod.GET)
 	public ResponseResult<ResultPage<List<Object[]>>> queryTable(@RequestParam(value="jobName", required = false) String jobName,@RequestParam(value="groupName",required = false) String groupName,
 			@RequestParam Integer pageNum, @RequestParam Integer pageSize,@RequestParam(value = "sort", required = false) String sort){
-		List<Object[]> li = Lists.newArrayListWithCapacity(10);
+		List<Object[]> li =  new ArrayList<>(10);;
 		Page<Object[]> list = null;
 //		SxTriggersDO dto=new SxTriggersDO();
 //		dto.setJOB_NAME(jobName);
@@ -279,7 +280,7 @@ public class JobApiController {
 	
 	@RequestMapping(value = "/jobTableParamList", method = RequestMethod.GET)
 	public List<String> queryTableParamList(){
-		List<String> list = Lists.newArrayListWithCapacity(0);
+		List<String> list = new ArrayList<>(12);
 		list.add("主键");
 		list.add("任务名");
 		list.add("任务组");
