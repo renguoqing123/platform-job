@@ -35,7 +35,7 @@ public class InitJobTrigger implements InitializingBean{
 	public void afterPropertiesSet() throws Exception {
 		log.info("-----------------初始化加载job任务开始---------------------");
 		Scheduler scheduler =  JobScheduler.schedulerFactory.getScheduler();
-		//handleSchedulerAll(scheduler);
+		handleSchedulerAll(scheduler);
         scheduler.start();//默认开启任务调度器
         log.info("-----------------初始化加载job任务结束---------------------");
 	}
@@ -46,6 +46,10 @@ public class InitJobTrigger implements InitializingBean{
 			return;
 		}
 		for(SxTriggersDO sx:sxTriggers) {
+			Boolean jobStatus = sx.getJOB_STATUS();
+			if(!jobStatus) {
+				continue;
+			}
 			// 1、job key
 			String jobName = sx.getJOB_NAME();
 			String jobGroup = sx.getJOB_GROUP();

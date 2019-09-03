@@ -31,7 +31,7 @@ public class SxTriggersDO {
 	@Column(length = 32)
     private String REQUEST_BODY;
 	@Column(length = 1)
-    private String JOB_STATUS;
+    private Boolean JOB_STATUS;
 	@Column(length = 500)
     private String REMARK;
 	@Column(length = 32)
