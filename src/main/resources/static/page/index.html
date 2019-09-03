@@ -152,12 +152,16 @@
   
   function addSub(){
 	  var a1 = $("#a1").val();
+	  $.ajaxSettings.async = false;
+	  var jobNameExist=false;
 	  $.get("/getJobNameExist?jobName="+a1,function(data,status){
-		  if(data == true){
-			  alert("该任务名已存在");
-			  return;
-		  }
+		  jobNameExist = data;
 	  });
+	  $.ajaxSettings.async = true;
+	  if(jobNameExist){
+		  alert("该任务名已存在");
+		  return;
+	  }
 	  
 	  var addurl="/addJob";
 	  var a2 = $("#a2").val();
@@ -260,6 +264,13 @@
 				  if(key == 0){
 					  index_key = values;
 				  }
+				  if(key == 7){
+					  if(values){
+						  values = "运行中";
+					  }else{
+						  values = "暂停";
+					  }
+				  }
 				  if(null==values){
 					  data += "<td></td>"; 
 				  }else{
@@ -267,9 +278,9 @@
 				  }
 				   
 			  })
-			  data += "<td><input type='button' onClick='updatejob("+index_key+")' value='修改'></input>"+
+			  data += "<td><input type='button' onClick='updatejob("+index_key+")' value='修改'></input><br>"+
 			  "<input type='button' onClick='deljob("+index_key+")' value='删除'><br>"+
-			  "<input type='button' onClick='startjob("+index_key+")' value='启用'>"+
+			  "<input type='button' onClick='startjob("+index_key+")' value='启用'><br>"+
 			  "<input type='button' onClick='stopjob("+index_key+")' value='停止'><br></input></td>";
 			  data += "<tr>"; 
 			  pdata += data;
@@ -337,7 +348,7 @@
 				  alert("删除任务失败");
 				  return;
 			  }
-			  searchTable(1,10)
+			  searchTable(1,10);
 		  });
 	  }
   }
@@ -351,6 +362,7 @@
 				  alert("启用任务失败");
 				  return;
 			  }
+			  searchTable(1,10)
 		  });
 	  }
   }
@@ -364,6 +376,7 @@
 				  alert("停止任务失败");
 				  return;
 			  }
+			  searchTable(1,10)
 		  });
 	  }
   }

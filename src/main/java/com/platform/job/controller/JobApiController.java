@@ -184,6 +184,7 @@ public class JobApiController {
         // 5、schedule job
         Date date = scheduler.scheduleJob(jobDetail, cronTrigger);
         log.info(">>>>>>>>>>> startJob success, jobDetail:{}, cronTrigger:{}, date:{}", jobDetail, cronTrigger, date);
+        sxTriggersDao.updateOneJobStatus(Boolean.TRUE, new Date(), "system", Long.parseLong(id));
 		return true;
     }
 	
@@ -195,6 +196,7 @@ public class JobApiController {
 		if(!bool) {
 			return false;
 		}
+		sxTriggersDao.updateOneJobStatus(Boolean.FALSE, new Date(), "system", Long.parseLong(id));
         return true;
     }
 	
@@ -285,6 +287,7 @@ public class JobApiController {
 		list.add("请求参数");
 		list.add("表达式");
 		list.add("任务描述");
+		list.add("任务状态");
 		list.add("备注");
 		list.add("创建人");
 		list.add("创建时间");

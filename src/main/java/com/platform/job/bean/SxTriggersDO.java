@@ -30,6 +30,8 @@ public class SxTriggersDO {
     private String REQUEST_URL;
 	@Column(length = 32)
     private String REQUEST_BODY;
+	@Column(length = 1)
+    private String JOB_STATUS;
 	@Column(length = 500)
     private String REMARK;
 	@Column(length = 32)

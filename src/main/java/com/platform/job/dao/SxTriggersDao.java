@@ -23,6 +23,11 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 	@Query(value = "UPDATE SX_TRIGGERS SET JOB_NAME=?1,DESCRIPTION=?2,CRON_EXPRESSION=?3,REQUEST_URL=?4,REQUEST_BODY=?5,REMARK=?6,MODIFY_DATE=?7,MODIFY_USER=?8 WHERE id=?9 ", nativeQuery = true)  
 	public void updateOne(String jobName, String description, String cronExpression, String url, String body, String remark, Date modifyDate,String modifyUser, Long id); 
 	
+	@Transactional
+	@Modifying  
+	@Query(value = "UPDATE SX_TRIGGERS SET JOB_STATUS=?1,MODIFY_DATE=?2,MODIFY_USER=?3 WHERE id=?4 ", nativeQuery = true)  
+	public void updateOneJobStatus(Boolean jobStatus, Date modifyDate,String modifyUser, Long id); 
+	
 	@Query(value = "SELECT ID FROM SX_TRIGGERS WHERE JOB_NAME=?1 ", nativeQuery = true)
 	public Long findOne(String jobName);
 	
@@ -35,23 +40,23 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 	@Query(value = "SELECT DISTINCT JOB_NAME FROM SX_TRIGGERS ", nativeQuery = true)
 	public List<String> findDistinctJobList();
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS WHERE ID=?1 ", nativeQuery = true)
 	public Object findOneById(String id);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS WHERE JOB_GROUP=:groupName ORDER BY CREATE_DATE DESC", nativeQuery = true)
 	public Page<Object[]> findByGroupList(@Param("groupName") String groupName,Pageable pageable);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS WHERE JOB_NAME=:jobName ORDER BY CREATE_DATE DESC", nativeQuery = true)
 	public Page<Object[]> findByJobList(@Param("jobName") String jobName,Pageable pageable);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS WHERE JOB_NAME=:jobName AND JOB_GROUP=:groupName ORDER BY CREATE_DATE DESC", nativeQuery = true)
 	public Page<Object[]> findByJobList(@Param("jobName") String jobName,@Param("groupName") String groupName,Pageable pageable);
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS ORDER BY CREATE_DATE DESC", nativeQuery = true)
 	public Page<Object[]> findByJobList(Pageable pageable);
 }
