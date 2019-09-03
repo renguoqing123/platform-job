@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.Lists;
 import com.platform.job.bean.SxTriggersDO;
 import com.platform.job.constants.Param;
 import com.platform.job.core.MyJob;
