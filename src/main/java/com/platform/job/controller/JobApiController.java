@@ -2,7 +2,6 @@ package com.platform.job.controller;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -14,14 +13,10 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,9 +41,10 @@ public class JobApiController {
 	private SxTriggersDao sxTriggersDao;
 	
 	@RequestMapping(value = "/addJob", method = RequestMethod.GET)
-	public void addJob(@RequestParam String jobName, @RequestParam String jobGroup, 
+	public boolean addJob(@RequestParam String jobName, @RequestParam String jobGroup, 
 			 @RequestParam String cronExpression,@RequestParam String url,
-			 @RequestParam(required = false) String body,@RequestParam(required = false) String description) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+			 @RequestParam(required = false) String body,@RequestParam(required = false) String description,
+			 @RequestParam(required = false) String remark,@RequestParam(required = false) String createUser) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
     	// 1、job key
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         JobKey jobKey = new JobKey(jobName, jobGroup);
@@ -56,7 +52,7 @@ public class JobApiController {
         Scheduler scheduler = JobScheduler.schedulerFactory.getScheduler();
         // 2、valid
         if (scheduler.checkExists(triggerKey)) {
-            return;    // PASS
+            return false;    // PASS
         }
 
         // 3、corn trigger
@@ -74,44 +70,23 @@ public class JobApiController {
         SxTriggersDO sxDo=new SxTriggersDO();
         sxDo.setJOB_NAME(jobName);
         sxDo.setJOB_GROUP(jobGroup);
-        sxDo.setDESCRIPTION(description);
+        sxDo.setDESCRIPTION(StringUtils.isEmpty(description)?null:description);
         sxDo.setCRON_EXPRESSION(cronExpression);
         sxDo.setREQUEST_URL(url);
-        sxDo.setREQUEST_BODY(body);
-        sxDo.setREMARK("直接执行任务");
+        sxDo.setREQUEST_BODY(StringUtils.isEmpty(body)?null:body);
+        sxDo.setREMARK(StringUtils.isEmpty(remark)?null:remark);
+        sxDo.setCREATE_USER(StringUtils.isEmpty(createUser)?null:createUser);
         sxDo.setCREATE_DATE(new Date());
         sxTriggersDao.save(sxDo);
         
         log.info(">>>>>>>>>>> addJob success, jobDetail:{}, cronTrigger:{}, date:{}", jobDetail, cronTrigger, date);
+        return true; 
     }
 	
 	@RequestMapping(value = "/updateJob", method = RequestMethod.GET)
 	public boolean updateJobCron(@RequestParam String jobGroup, @RequestParam String jobName, @RequestParam(required = false)String cronExpression,
-			@RequestParam(required = false) String url,
-			 @RequestParam(required = false) String body,@RequestParam(required = false) String description) throws SchedulerException {
-
-        // 1、job key
-//        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-//        Scheduler scheduler = JobScheduler.schedulerFactory.getScheduler();
-//        // 2、valid
-//        if (!scheduler.checkExists(triggerKey)) {
-//            return true;    // PASS
-//        }
-//
-//        CronTrigger oldTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
-//
-//        // 3、avoid repeat cron
-//        String oldCron = oldTrigger.getCronExpression();
-//        if (oldCron.equals(cronExpression)){
-//            return true;    // PASS
-//        }
-//
-//        // 4、new cron trigger
-//        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();
-//        oldTrigger = oldTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
-//
-//        // 5、rescheduleJob
-//        scheduler.rescheduleJob(triggerKey, oldTrigger);
+			@RequestParam(required = false) String url,@RequestParam(required = false) String body,@RequestParam(required = false) String description,
+			@RequestParam(required = false) String remark,@RequestParam(required = false) String modifyUser) throws SchedulerException {
 		Long id = sxTriggersDao.findOne(jobName);
 		if(null != url) {
 			SxTriggersDO sx = sxTriggersDao.findById(id).get();
@@ -139,7 +114,11 @@ public class JobApiController {
 	        Date date = scheduler.scheduleJob(jobDetail, cronTrigger);
 	        log.info(">>>>>>>>>>> resumeJob success, JobGroup:{}, JobName:{}, date:{}", jobGroup, jobName, date);
 		}
-        sxTriggersDao.updateOne(jobName, description, cronExpression, url, body, "直接执行任务", new Date(), id);
+		description = StringUtils.isEmpty(description)?null:description;
+		body = StringUtils.isEmpty(body)?null:body;
+		remark = StringUtils.isEmpty(remark)?null:remark;
+		modifyUser = StringUtils.isEmpty(modifyUser)?null:modifyUser;
+        sxTriggersDao.updateOne(jobName, description, cronExpression, url, body, remark, new Date(),modifyUser, id);
         return true;
     }
 	
@@ -214,6 +193,11 @@ public class JobApiController {
 	public List<String> getJobByGroupNameList(@RequestParam String groupName) {
 		List<String> jobList = sxTriggersDao.findJobByGroupNameList(groupName);
         return jobList;
+    }
+	
+	@RequestMapping(value = "/getJobById", method = RequestMethod.GET)
+	public Object getJobById(@RequestParam String id) {
+        return sxTriggersDao.findOneById(id);
     }
 	
 	@RequestMapping(value = "/queryJobTable", method = RequestMethod.GET)

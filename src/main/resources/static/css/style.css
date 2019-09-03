@@ -1,4 +1,4 @@
-#job { 
+.jobCla { 
 width:350px; 
 height:250px; 
 border:1px solid #ccc; 
@@ -7,7 +7,7 @@ display:block;
 z-index:9999; 
 background:#fff; 
 } 
-#job h2 { 
+.jobCla h2 { 
 height:40px; 
 line-height:40px; 
 text-align:center; 
@@ -19,43 +19,44 @@ padding:0;
 border-bottom:1px solid #ccc; 
 cursor:move; 
 } 
-#job h2 img { 
+.jobCla h2 img { 
 float:right; 
 position:relative; 
 top:14px; 
 right:8px; 
 cursor:pointer; 
 } 
-#job div.info { 
+.jobCla div.info { 
 padding:10px 0 5px 0; 
 text-align:center; 
 color:maroon; 
 } 
-#job div.job, #job div.group, #job div.url, 
-#job div.body, #job div.cron, #job div.desc { 
+.jobCla div.job, .jobCla div.group, .jobCla div.url, 
+.jobCla div.body, .jobCla div.cron, .jobCla div.desc,
+.jobCla div.remark, .jobCla div.create, .jobCla div.date { 
 font-size:14px; 
 color:#666; 
 padding:5px 0; 
 text-align:center; 
 } 
-#job input.text { 
+.jobCla input.text { 
 width:200px; 
 height:25px; 
 border:1px solid #ccc; 
 background:#fff; 
 font-size:14px; 
 } 
-#job .button { 
+.jobCla .button { 
 text-align:center; 
 padding:15px 0; 
 } 
-#job input.submit { 
+.jobCla input.submit { 
 width:107px; 
 height:30px; 
 border:none; 
 cursor:pointer; 
 } 
-#job .other { 
+.jobCla .other { 
 text-align:right; 
 padding:15px 10px; 
 color:#666; 

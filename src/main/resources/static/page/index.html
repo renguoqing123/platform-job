@@ -81,17 +81,37 @@
   </div>
   
 
-	<div id="job" style="display: none;"> 
+	<div id="job" class="jobCla" style="display: none;"> 
 	<h2><img src="" alt="" class="close" />添加job任务</h2> 
 	<form id="jobForm" > 
 	<div class="info"></div> 
-	<div class="job">任务名：<input type="text" name="user" class="text" /></div> 
-	<div class="group">任务组：<input type="text" name="pass" class="text" /></div> 
-	<div class="url">请求地址：<input type="text" name="requestUrl" class="text" /></div>
-	<div class="body">请求内容：<input type="text" name="requestBody" class="text" /></div>
-	<div class="cron">表达式：<input type="text" name="ca" class="text" /></div> 
-	<div class="desc">描述：<input type="text" name="description" class="text" /></div> 
-	<div class="button"><input type="button" name="sub" class="submit" value="确认" /></div> 
+	<div class="job">任务名：<input type="text" id="a1" name="user" class="text" /></div> 
+	<div class="group">任务组：<input type="text" id="a2" name="pass" class="text" /></div> 
+	<div class="url">请求地址：<input type="text" id="a3" name="requestUrl" class="text" /></div>
+	<div class="body">请求参数：<input type="text" id="a4" name="requestBody" class="text" /></div>
+	<div class="cron">表达式：<input type="text" id="a5" name="cron" class="text" /></div> 
+	<div class="desc">任务描述：<input type="text" id="a6" name="description" class="text" /></div> 
+	<div class="remark">备注：<input type="text" id="a7" name="remark" class="text" /></div>
+	<div class="create">创建人：<input type="text" id="a8" name="create" class="text" /></div>
+	<div style="display: none;" class="date">时间：<input type="text" id="a9" name="date" class="text" /></div>
+	<div class="button"><input type="button" id="" name="sub" onclick="addSub()" class="submit" value="确认" />&nbsp;&nbsp;<input type="button" name="sub" class="submit" onclick="winClose()" value="取消" /></div> 
+	</form> 
+	</div> 
+	
+	<div id="jobUpdate" class="jobCla" style="display: none;"> 
+	<h2><img src="" alt="" class="close" />修改job任务</h2> 
+	<form id="jobForm" > 
+	<div class="info"><input type="text" id="u0" style="display: none;" name="id" class="text" /></div> 
+	<div class="job">任务名：<input type="text" id="u1" name="user" class="text" disabled="disabled"/></div> 
+	<div class="group">任务组：<input type="text" id="u2" name="pass" class="text" disabled="disabled"/></div> 
+	<div class="url">请求地址：<input type="text" id="u3" name="requestUrl" class="text" /></div>
+	<div class="body">请求参数：<input type="text" id="u4" name="requestBody" class="text" /></div>
+	<div class="cron">表达式：<input type="text" id="u5" name="cron" class="text" /></div> 
+	<div class="desc">任务描述：<input type="text" id="u6" name="desc" class="text" /></div> 
+	<div class="remark">备注：<input type="text" id="u7" name="remark" class="text" /></div>
+	<div class="create">修改人：<input type="text" id="u8" name="create" class="text" /></div>
+	<div style="display: none;" class="date">时间：<input type="text" id="u9" name="date" class="text" /></div>
+	<div class="button"><input type="button" id="" name="sub" onclick="updateSub()" class="submit" value="确认" />&nbsp;&nbsp;<input type="button" name="sub" class="submit" onclick="winUpdateClose()" value="取消" /></div> 
 	</form> 
 	</div> 
 
@@ -130,9 +150,39 @@
 	  });
   }
   
+  function addSub(){
+	  var addurl="/addJob";
+	  var a1 = $("#a1").val();
+	  var a2 = $("#a2").val();
+	  var a3 = $("#a3").val();
+	  var a4 = $("#a4").val();
+	  var a5 = $("#a5").val();
+	  var a6 = $("#a6").val();
+	  var a7 = $("#a7").val();
+	  var a8 = $("#a8").val();
+	  if(''==a1 || ''==a2 || ''==a3 || ''==a5){
+		  alert("请求参数有误");
+		  return ;
+	  }
+	  addurl = addurl + "?jobName="+a1+"&jobGroup="+a2+"&url="+a3+"&body="+a4+"&cronExpression="+a5+"&description="+a6+"&remark="+a7+"&createUser="+a8;
+	  $.get(addurl,function(data,status){
+		  if(data == true){
+			  alert("添加任务成功");
+		  }else{
+			  alert("添加任务失败");
+			  return;
+		  }
+		  winClose();
+	  });
+  }
+  
   function addjob(){
 	 // window.open('addeEject.html',"newwindow", "height=100, width=400, top=50%, left=50%, toolbar=no,menubar=no, scrollbars=no, resizable=no, location=no, status=no");
-	  $("#job").show().center(450,350);//展现登陆框                                           
+	  $("#job").show().center(450,440);//展现登陆框                                           
+  }
+  
+  function winClose(){
+	  $("#job").hide().center(450,440);//展现登陆框      
   }
   
   function gradeTableChange(){
@@ -197,7 +247,11 @@
 		  var dd = d.data;
 		  $.each(dd,function(key,map){
 			  var data="<tr>";
+			  var index_key;
 			  $.each(map,function(key,values){
+				  if(key == 0){
+					  index_key = values;
+				  }
 				  if(null==values){
 					  data += "<td></td>"; 
 				  }else{
@@ -205,7 +259,7 @@
 				  }
 				   
 			  })
-			  data += "<td><input type='button' onClick='addjob()' value='修改'></input><input type='button' onClick='addjob()' value='删除'></input></td>";
+			  data += "<td><input type='button' onClick='updatejob("+index_key+")' value='修改'></input><input type='button' onClick='deljob("+index_key+")' value='删除'></input></td>";
 			  data += "<tr>"; 
 			  pdata += data;
 		  })
@@ -218,6 +272,52 @@
 			 $("#fenye").hide(); 
 		  }
 	  });
+  }
+  
+  function updateSub(){
+	  var addurl="/updateJob";
+	  var u1 = $("#u1").val();
+	  var u2 = $("#u2").val();
+	  var u3 = $("#u3").val();
+	  var u4 = $("#u4").val();
+	  var u5 = $("#u5").val();
+	  var u6 = $("#u6").val();
+	  var u7 = $("#u7").val();
+	  var u8 = $("#u8").val();
+	  if(''==u1 || ''==u2 || ''==u3 || ''==u5){
+		  alert("请求参数有误");
+		  return ;
+	  }
+	  addurl = addurl + "?jobName="+u1+"&jobGroup="+u2+"&url="+u3+"&body="+u4+"&cronExpression="+u5+"&description="+u6+"&remark="+u7+"&modifyUser="+u8;
+	  $.get(addurl,function(data,status){
+		  if(data == true){
+			  alert("修改任务成功");
+		  }else{
+			  alert("修改任务失败");
+			  return;
+		  }
+		  winUpdateClose();
+	  });
+  }
+  
+  function updatejob(key){
+	  $.get("/getJobById?id="+key,function(data,status){
+		  $.each(data,function(key,value){
+			  var u="u"+key;
+			  if(null!=value){
+				  document.getElementById(u).value=value;
+			  }
+		  })
+	  });
+	  $("#jobUpdate").show().center(450,440);//展现登陆框
+  }
+  
+  function winUpdateClose(){
+	  $("#jobUpdate").hide().center(450,440);//展现登陆框
+  }
+  
+  function deljob(key){
+	  
   }
   
   function shuangji(key){
