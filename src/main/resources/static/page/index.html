@@ -151,8 +151,15 @@
   }
   
   function addSub(){
-	  var addurl="/addJob";
 	  var a1 = $("#a1").val();
+	  $.get("/getJobNameExist?jobName="+a1,function(data,status){
+		  if(data == true){
+			  alert("该任务名已存在");
+			  return;
+		  }
+	  });
+	  
+	  var addurl="/addJob";
 	  var a2 = $("#a2").val();
 	  var a3 = $("#a3").val();
 	  var a4 = $("#a4").val();
@@ -173,6 +180,7 @@
 			  return;
 		  }
 		  winClose();
+		  searchTable(1,10);
 	  });
   }
   
@@ -259,7 +267,10 @@
 				  }
 				   
 			  })
-			  data += "<td><input type='button' onClick='updatejob("+index_key+")' value='修改'></input><input type='button' onClick='deljob("+index_key+")' value='删除'></input></td>";
+			  data += "<td><input type='button' onClick='updatejob("+index_key+")' value='修改'></input>"+
+			  "<input type='button' onClick='deljob("+index_key+")' value='删除'><br>"+
+			  "<input type='button' onClick='startjob("+index_key+")' value='启用'>"+
+			  "<input type='button' onClick='stopjob("+index_key+")' value='停止'><br></input></td>";
 			  data += "<tr>"; 
 			  pdata += data;
 		  })
@@ -275,7 +286,7 @@
   }
   
   function updateSub(){
-	  var addurl="/updateJob";
+	  var addurl="/updateJobData";
 	  var u1 = $("#u1").val();
 	  var u2 = $("#u2").val();
 	  var u3 = $("#u3").val();
@@ -297,6 +308,7 @@
 			  return;
 		  }
 		  winUpdateClose();
+		  searchTable(1,10)
 	  });
   }
   
@@ -317,7 +329,43 @@
   }
   
   function deljob(key){
-	  
+	  if(confirm("【删除job同时停止该任务的运行】您确认要删除吗？")){
+		  $.get("/delJobById?id="+key,function(data,status){
+			  if(data == true){
+				  alert("删除任务成功");
+			  }else{
+				  alert("删除任务失败");
+				  return;
+			  }
+			  searchTable(1,10)
+		  });
+	  }
+  }
+  
+  function startjob(key){
+	  if(confirm("您确认要开启吗？")){
+		  $.get("/startJob?id="+key,function(data,status){
+			  if(data == true){
+				  alert("启用任务成功");
+			  }else{
+				  alert("启用任务失败");
+				  return;
+			  }
+		  });
+	  }
+  }
+  
+  function stopjob(key){
+	  if(confirm("您确认要停止吗？")){
+		  $.get("/stopJob?id="+key,function(data,status){
+			  if(data == true){
+				  alert("停止任务成功");
+			  }else{
+				  alert("停止任务失败");
+				  return;
+			  }
+		  });
+	  }
   }
   
   function shuangji(key){

@@ -2,6 +2,7 @@ package com.platform.job.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -122,6 +123,22 @@ public class JobApiController {
         return true;
     }
 	
+	@RequestMapping(value = "/updateJobData", method = RequestMethod.GET)
+	public boolean updateJobData(@RequestParam String jobGroup, @RequestParam String jobName, @RequestParam(required = false)String cronExpression,
+			@RequestParam(required = false) String url,@RequestParam(required = false) String body,@RequestParam(required = false) String description,
+			@RequestParam(required = false) String remark,@RequestParam(required = false) String modifyUser) throws SchedulerException {
+		Long id = sxTriggersDao.findOne(jobName);
+		if(null == id) {
+			return false;
+		}
+		description = StringUtils.isEmpty(description)?null:description;
+		body = StringUtils.isEmpty(body)?null:body;
+		remark = StringUtils.isEmpty(remark)?null:remark;
+		modifyUser = StringUtils.isEmpty(modifyUser)?null:modifyUser;
+        sxTriggersDao.updateOne(jobName, description, cronExpression, url, body, remark, new Date(),modifyUser, id);
+        return true;
+	}
+	
 	@RequestMapping(value = "/removeJob", method = RequestMethod.GET)
 	public static boolean removeJob(@RequestParam String jobName, @RequestParam String jobGroup) throws SchedulerException {
 
@@ -137,21 +154,25 @@ public class JobApiController {
 	
 	
 	@RequestMapping(value = "/startJob", method = RequestMethod.GET)
-	public void startJob(@RequestParam String jobName) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		Long id = sxTriggersDao.findOne(jobName);
-		SxTriggersDO sx = sxTriggersDao.findById(id).get();
-		jobName = sx.getJOB_NAME();
-		String jobGroup = sx.getJOB_GROUP();
-		String cronExpression = sx.getCRON_EXPRESSION();
-		String url = sx.getREQUEST_URL();
-		String body = sx.getREQUEST_BODY();
-		TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+	public boolean startJob(@RequestParam String id) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		Optional<SxTriggersDO> opt = sxTriggersDao.findById(Long.parseLong(id));
+		SxTriggersDO dto= opt.get();
+		String jobName = dto.getJOB_NAME();
+		String jobGroup = dto.getJOB_GROUP();
+		String cronExpression = dto.getCRON_EXPRESSION();
+		String url = dto.getREQUEST_URL();
+		String body = dto.getREQUEST_BODY();
+		
+		// 1、job key
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+
         Scheduler scheduler = JobScheduler.schedulerFactory.getScheduler();
-        // 2、del
+        // 2、valid
         if (scheduler.checkExists(triggerKey)) {
-        	scheduler.unscheduleJob(triggerKey); 
+            return false;    // PASS
         }
-		JobKey jobKey = new JobKey(jobName, jobGroup);
+
         // 3、corn trigger
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();   // withMisfireHandlingInstructionDoNothing 忽略掉调度终止过程中忽略的调度
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
@@ -162,18 +183,18 @@ public class JobApiController {
         
         // 5、schedule job
         Date date = scheduler.scheduleJob(jobDetail, cronTrigger);
-        log.info(">>>>>>>>>>> startJob success, jobName:{},date:{}", jobName,date);
+        log.info(">>>>>>>>>>> startJob success, jobDetail:{}, cronTrigger:{}, date:{}", jobDetail, cronTrigger, date);
+		return true;
     }
 	
 	@RequestMapping(value = "/stopJob", method = RequestMethod.GET)
-	public boolean stopJob(@RequestParam String jobName, @RequestParam String jobGroup) throws SchedulerException {
-
-        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
-        Scheduler scheduler = JobScheduler.schedulerFactory.getScheduler();
-        if (scheduler.checkExists(triggerKey)) {
-            scheduler.unscheduleJob(triggerKey);    // trigger + job
-        }
-        log.info(">>>>>>>>>>> stopJob success, triggerKey:{}", triggerKey);
+	public boolean stopJob(@RequestParam String id) throws SchedulerException {
+		Optional<SxTriggersDO> opt = sxTriggersDao.findById(Long.parseLong(id));
+		SxTriggersDO dto= opt.get();
+		boolean bool = removeJob(dto.getJOB_NAME(),dto.getJOB_GROUP());
+		if(!bool) {
+			return false;
+		}
         return true;
     }
 	
@@ -198,6 +219,28 @@ public class JobApiController {
 	@RequestMapping(value = "/getJobById", method = RequestMethod.GET)
 	public Object getJobById(@RequestParam String id) {
         return sxTriggersDao.findOneById(id);
+    }
+	
+	@RequestMapping(value = "/getJobNameExist", method = RequestMethod.GET)
+	public boolean getJobNameExist(@RequestParam String jobName) {
+		Long id = sxTriggersDao.findOne(jobName);
+		if(null != id) {
+			return true;
+		}
+		return false;
+    }
+	
+	
+	@RequestMapping(value = "/delJobById", method = RequestMethod.GET)
+	public boolean delJobById(@RequestParam String id) throws SchedulerException {
+		Optional<SxTriggersDO> opt = sxTriggersDao.findById(Long.parseLong(id));
+		SxTriggersDO dto= opt.get();
+		boolean bool = removeJob(dto.getJOB_NAME(),dto.getJOB_GROUP());
+		if(!bool) {
+			return false;
+		}
+		sxTriggersDao.deleteById(Long.parseLong(id));
+        return true;
     }
 	
 	@RequestMapping(value = "/queryJobTable", method = RequestMethod.GET)
