@@ -1,0 +1,295 @@
+Configuration:
+  # 用于设置log4j2自身内部的信息输出级别
+  # 日志级别：TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+  status: INFO
+  # 自动检测配置文件和重新配置间隔时间（秒），
+  monitorInterval: 600
+  # 属性值
+  properties:
+    property:
+      -
+        # 日志文件输出目录地址
+        name: LOG_HOME
+        value: /logs/mtcplat/platform-job
+
+      -
+        # 日志文件名称（前缀）
+        name: FILE_NAME
+        value: platform-job
+
+      -
+        # 日志输出格式
+            # %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间,输出到毫秒的时间
+            # %-5level : 输出日志级别，-5表示左对齐并且固定输出5个字符，如果不足在右边补0
+            # %c : logger的名称(%logger)
+            # %t : 输出当前线程名称
+            # %p : 日志输出格式
+            # %m : 日志内容，即 logger.info("message")
+            # %n : 换行符
+            # %C : Java类名(%F)
+            # %L : 行号
+            # %M : 方法名
+            # %l : 输出语句所在的行数, 包括类名、方法名、文件名、行数
+            # hostName : 本地机器名
+            # hostAddress : 本地ip地址
+        name: LOG_PATTERN
+        value: "%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level [%t] %-36c{1.} : %m%n"
+
+      -
+         # 具体包下的日志单独打印，将somPackage改为具体包名
+         # 如value：com.gyc.trade，表示该包下的日志单独打印在com.gyc.trade-ALL.info文件中
+        name: SOME_PACKAGE
+        value: com.platform.job
+  # 输出目的地
+  appenders:
+    # 控制台Console
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      # 只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）
+      ThresholdFilter:
+        level: INFO
+        onMatch: ACCEPT
+        onMismatch: DENY
+      # 日志输出格式
+      PatternLayout:
+        Pattern: ${LOG_PATTERN}
+    # 循环日志文件：程序每次启动，日志文件大于阈值，每新1天三种情况都会新启一个新的文件记录日志
+    RollingRandomAccessFile:
+      -
+        ####只输出 DEBUG 级别日志####
+        name: DEBUG
+        # 当前日志文件的位置和文件名称
+        fileName: "${LOG_HOME}/${FILE_NAME}-DEBUG.log"
+        # 当发生Rolling时，文件的转移和重命名规则
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-DEBUG-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        # Rolling 策略
+        Policies:
+          # filePattern结合使用
+            # 注意filePattern中配置的文件重命名规则是${FILE_NAME}_%d{yyyy-MM-dd}_%i，最小的时间粒度是dd，即天，
+            # TimeBasedTriggeringPolicy指定的size是1，结合起来就是每1天生成一个新文件
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          # 当文件体积大于size指定的值时，触发Rolling
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          # 程序每次启动时，Rolling
+          OnStartupTriggeringPolicy:
+          # 文件必定发生rollover操作的最小尺寸，默认值为1，这将阻止空文件发送rollover
+            minSize: 1
+        DefaultRolloverStrategy:
+          # 最多保存的文件个数
+          max: 30
+          # 日志存档保留策略(删除操作)
+          Delete:
+            # 必参。从哪里扫描要删除的文件的基本路径。
+            basePath: ${LOG_HOME}
+            # 要访问的目录的最大级别数。值为0表示仅访问起始文件（基本路径本身），除非被安全管理者拒绝。
+            # Integer.MAX_VALUE的值表示应该访问所有级别。默认为1，意思是指定基本目录中的文件。
+            maxDepth: 2
+            IfFileName:
+              # 使用类似于正则表达式但是又具有更简单的有限模式语言来匹配相对路径（相对于基本路径）
+              glob: "*/${FILE_NAME}-DEBUG-*.log.gz"
+            IfLastModified:
+              # 必须。指定持续时间duration。该条件接受比指定持续时间更早或更旧的文件。
+              age: "60d"
+        # 只输出 DEBUG 级别日志
+        Filters:
+            ThresholdFilter:
+              -
+               level: INFO
+               onMatch: DENY
+               onMismatch: NEUTRAL
+              -
+                level: DEBUG
+                onMatch: ACCEPT
+                onMismatch: DENY
+      -
+        ####只输出 INFO 级别日志####
+        name: INFO
+        fileName: "${LOG_HOME}/${FILE_NAME}-INFO.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-INFO-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-INFO-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+              -
+               level: WARN
+               onMatch: DENY
+               onMismatch: NEUTRAL
+              -
+                level: INFO
+                onMatch: ACCEPT
+                onMismatch: DENY
+      -
+        ####只输出 WARN 级别日志####
+        name: WARN
+        fileName: "${LOG_HOME}/${FILE_NAME}-WARN.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-WARN-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-WARN-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+              -
+               level: WARN
+               onMatch: DENY
+               onMismatch: NEUTRAL
+              -
+                level: INFO
+                onMatch: ACCEPT
+                onMismatch: DENY
+      -
+        ####只输出 ERROR 级别日志####
+        name: ERROR
+        fileName: "${LOG_HOME}/${FILE_NAME}-ERROR.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-ERROR-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-ERROR-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+              -
+               level: FATAL
+               onMatch: DENY
+               onMismatch: NEUTRAL
+              -
+                level: ERROR
+                onMatch: ACCEPT
+                onMismatch: DENY
+      -
+        ####输出level设定级别以上的日志####
+        name: ALL
+        fileName: "${LOG_HOME}/${FILE_NAME}-ALL.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-ALL-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-ALL-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+                level: DEBUG
+                onMatch: ACCEPT
+                onMismatch: DENY
+      -
+        name: SOME_PACKAGE_APN
+        fileName: "${LOG_HOME}/${SOME_PACKAGE}-ALL.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${SOME_PACKAGE}-ALL-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: "10 MB"
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-ALL-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+                level: DEBUG
+                onMatch: ACCEPT
+                onMismatch: DENY
+  # 定义logger
+  # 注：全局异步配置在文件log4j2.component.properties中
+  Loggers:
+    logger:
+      -
+        ### 某包下的日志logger
+        name: "${SOME_PACKAGE}"
+        # 该包日志的输出级别
+        level: INFO
+        # 不继承root Logger
+        additivity: false
+        # 该包日志输出目的地
+        AppenderRef:
+          # 引用appenders定义的appender（根据其name）
+          - ref: SOME_PACKAGE_APN
+          - ref: CONSOLE
+      -
+        ### spring包下的日志只输出INFO级别以上
+        name: org.springframework
+        level: INFO
+      -
+        ### hibernate包下的日志只输出INFO级别以上
+        name: org.hibernate
+        level: INFO
+    Root:
+      level: DEBUG
+      AppenderRef:
+        - ref: CONSOLE
+        - ref: ALL
+        - ref: DEBUG
+        - ref: INFO
+        - ref: WARN
+        - ref: ERROR
