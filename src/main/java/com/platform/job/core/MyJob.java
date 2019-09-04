@@ -6,6 +6,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
+import org.springframework.util.StringUtils;
 
 import com.platform.job.constants.Param;
 
@@ -28,11 +29,11 @@ public class MyJob implements Job{
         Object url = dataMap.get(Param.REQUEST_URL);
         Object body = dataMap.get(Param.REQUEST_BODY);
         log.info("请求地址:{}", url);
-        if(null != body) {
+        if(!StringUtils.isEmpty(body)) {
         	log.info("请求报文:{}", body);
         	HttpClientUtil.doPostJson(url.toString(), body.toString());
         }
-        if(null != url) {
+        if(!StringUtils.isEmpty(url)) {
         	HttpClientUtil.doGet(url.toString());
         }
         log.info("============job任务结束执行===========");
