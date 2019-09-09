@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -75,6 +77,7 @@ public class JobApiController {
         sxDo.setCRON_EXPRESSION(cronExpression);
         sxDo.setREQUEST_URL(url);
         sxDo.setREQUEST_BODY(StringUtils.isEmpty(body)?null:body);
+        sxDo.setJOB_STATUS(Boolean.TRUE);//默认开启
         sxDo.setREMARK(StringUtils.isEmpty(remark)?null:remark);
         sxDo.setCREATE_USER(StringUtils.isEmpty(createUser)?null:createUser);
         sxDo.setCREATE_DATE(new Date());
@@ -255,7 +258,10 @@ public class JobApiController {
 //		dto.setJOB_GROUP(groupName);
 //		ExampleMatcher matcher = ExampleMatcher.matching();
 //		Example<SxTriggersDO> ex = Example.of(dto, matcher); 
-		Pageable pageable = PageRequest.of(pageNum-1, pageSize);
+		Sort s = new Sort(Direction.DESC, "CREATE_DATE");
+		if(0==pageNum) {pageNum=1;}
+//		int pageNo = ((pageNum-1)*pageSize);
+		Pageable pageable = PageRequest.of(pageNum-1, pageSize, s);
 		if(!StringUtils.isEmpty(jobName) && !StringUtils.isEmpty(groupName)) {
 //			list = sxTriggersDao.findAll(ex,pageable);
 			list = sxTriggersDao.findByJobList(jobName,groupName,pageable);
@@ -271,6 +277,9 @@ public class JobApiController {
 			li = list.getContent();
 		}
 		ResultPage<List<Object[]>> resPage = new ResultPage<>();
+		resPage.setPageNum(pageNum);
+		resPage.setPageSize(pageSize);
+		resPage.setTotal(list.getTotalElements());
 		resPage.setData(li);
 		ResponseResult<ResultPage<List<Object[]>>> result = new ResponseResult<>();
 		result.setData(resPage);

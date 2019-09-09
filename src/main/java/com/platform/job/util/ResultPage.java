@@ -7,7 +7,7 @@ public class ResultPage<T> {
 	
 	private int pageNum;
 	private int pageSize;
-	private int total;
+	private Long total;
 	
 	private T data;
 	
