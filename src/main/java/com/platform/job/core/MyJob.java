@@ -31,10 +31,12 @@ public class MyJob implements Job{
         log.info("请求地址:{}", url);
         if(!StringUtils.isEmpty(body)) {
         	log.info("请求报文:{}", body);
-        	HttpClientUtil.doPostJson(url.toString(), body.toString());
+        	String result = HttpClientUtil.doPostJson(url.toString(), body.toString());
+        	log.info("返回结果:{}", result);
         }
         if(!StringUtils.isEmpty(url)) {
-        	HttpClientUtil.doGet(url.toString());
+        	String result = HttpClientUtil.doGet(url.toString());
+        	log.info("返回结果:{}", result);
         }
         log.info("============job任务结束执行===========");
 	}

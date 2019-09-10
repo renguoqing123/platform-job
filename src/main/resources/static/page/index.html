@@ -175,17 +175,28 @@
 		  alert("请求参数有误");
 		  return ;
 	  }
-	  addurl = addurl + "?jobName="+a1+"&jobGroup="+a2+"&url="+a3+"&body="+a4+"&cronExpression="+a5+"&description="+a6+"&remark="+a7+"&createUser="+a8;
-	  $.get(addurl,function(data,status){
-		  if(data == true){
-			  alert("添加任务成功");
-		  }else{
-			  alert("添加任务失败");
-			  return;
+	  //addurl = addurl + "?jobName="+a1+"&jobGroup="+a2+"&url="+a3+"&body="+a4+"&cronExpression="+a5+"&description="+a6+"&remark="+a7+"&createUser="+a8;
+	  
+	  var param = {"jobName":a1,"jobGroup":a2,"url":a3,"body":a4,"cronExpression":a5,"description":a6,"remark":a7,"createUser":a8}
+	  
+	  $.ajax({
+		  url:addurl,
+	  	  type:"post",
+	  	  data:JSON.stringify(param),
+	  	  contentType:"application/json;charset=utf-8",
+	  	  dataType:"json",
+	  	  success:function(data,status){
+			  if(data == true){
+				  alert("添加任务成功");
+			  }else{
+				  alert("添加任务失败");
+				  return;
+			  }
+			  winClose();
+			  searchTable(1,10);
 		  }
-		  winClose();
-		  searchTable(1,10);
 	  });
+	  
   }
   
   function addjob(){
@@ -310,17 +321,28 @@
 		  alert("请求参数有误");
 		  return ;
 	  }
-	  addurl = addurl + "?jobName="+u1+"&jobGroup="+u2+"&url="+u3+"&body="+u4+"&cronExpression="+u5+"&description="+u6+"&remark="+u7+"&modifyUser="+u8;
-	  $.get(addurl,function(data,status){
-		  if(data == true){
-			  alert("修改任务成功");
-		  }else{
-			  alert("修改任务失败");
-			  return;
+	  //addurl = addurl + "?jobName="+u1+"&jobGroup="+u2+"&url="+u3+"&body="+u4+"&cronExpression="+u5+"&description="+u6+"&remark="+u7+"&modifyUser="+u8;
+
+	  var param = {"jobName":u1,"jobGroup":u2,"url":u3,"body":u4,"cronExpression":u5,"description":u6,"remark":u7,"modifyUser":u8}
+	  
+	  $.ajax({
+		  url:addurl,
+	  	  type:"post",
+	  	  data:JSON.stringify(param),
+	  	  contentType:"application/json;charset=utf-8",
+	  	  dataType:"json",
+	  	  success:function(data,status){
+			  if(data == true){
+				  alert("修改任务成功");
+			  }else{
+				  alert("修改任务失败");
+				  return;
+			  }
+			  winUpdateClose();
+			  searchTable(1,10);
 		  }
-		  winUpdateClose();
-		  searchTable(1,10)
 	  });
+	  
   }
   
   function updatejob(key){

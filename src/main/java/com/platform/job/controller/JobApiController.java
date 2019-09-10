@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,7 @@ import com.platform.job.bean.SxTriggersDO;
 import com.platform.job.constants.Param;
 import com.platform.job.core.MyJob;
 import com.platform.job.dao.SxTriggersDao;
+import com.platform.job.model.JobDataReq;
 import com.platform.job.scheduler.JobScheduler;
 import com.platform.job.util.ResponseResult;
 import com.platform.job.util.ResultPage;
@@ -43,11 +45,18 @@ public class JobApiController {
 	@Autowired
 	private SxTriggersDao sxTriggersDao;
 	
-	@RequestMapping(value = "/addJob", method = RequestMethod.GET)
-	public boolean addJob(@RequestParam String jobName, @RequestParam String jobGroup, 
-			 @RequestParam String cronExpression,@RequestParam String url,
-			 @RequestParam(required = false) String body,@RequestParam(required = false) String description,
-			 @RequestParam(required = false) String remark,@RequestParam(required = false) String createUser) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	@RequestMapping(value = "/addJob", method = RequestMethod.POST)
+	public boolean addJob(@RequestBody JobDataReq req) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		
+		String jobName=req.getJobName();  
+		String jobGroup=req.getJobGroup(); 
+		String cronExpression=req.getCronExpression(); 
+		String url=req.getUrl();
+		String body=req.getBody(); 
+		String description=req.getDescription();
+		String remark=req.getRemark(); 
+		String createUser=req.getCreateUser();
+		
     	// 1、job key
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         JobKey jobKey = new JobKey(jobName, jobGroup);
@@ -87,7 +96,7 @@ public class JobApiController {
         return true; 
     }
 	
-	@RequestMapping(value = "/updateJob", method = RequestMethod.GET)
+	@RequestMapping(value = "/updateJob", method = RequestMethod.POST)
 	public boolean updateJobCron(@RequestParam String jobGroup, @RequestParam String jobName, @RequestParam(required = false)String cronExpression,
 			@RequestParam(required = false) String url,@RequestParam(required = false) String body,@RequestParam(required = false) String description,
 			@RequestParam(required = false) String remark,@RequestParam(required = false) String modifyUser) throws SchedulerException {
@@ -126,10 +135,15 @@ public class JobApiController {
         return true;
     }
 	
-	@RequestMapping(value = "/updateJobData", method = RequestMethod.GET)
-	public boolean updateJobData(@RequestParam String jobGroup, @RequestParam String jobName, @RequestParam(required = false)String cronExpression,
-			@RequestParam(required = false) String url,@RequestParam(required = false) String body,@RequestParam(required = false) String description,
-			@RequestParam(required = false) String remark,@RequestParam(required = false) String modifyUser) throws SchedulerException {
+	@RequestMapping(value = "/updateJobData", method = RequestMethod.POST)
+	public boolean updateJobData(@RequestBody JobDataReq req) throws SchedulerException {
+		String jobName=req.getJobName();  
+		String cronExpression=req.getCronExpression(); 
+		String url=req.getUrl();
+		String body=req.getBody(); 
+		String description=req.getDescription();
+		String remark=req.getRemark(); 
+		String modifyUser=req.getModifyUser();
 		Long id = sxTriggersDao.findOne(jobName);
 		if(null == id) {
 			return false;
