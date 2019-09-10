@@ -33,7 +33,7 @@ public class MyJob implements Job{
         	log.info("请求报文:{}", body);
         	String result = HttpClientUtil.doPostJson(url.toString(), body.toString());
         	log.info("返回结果:{}", result);
-        }else if(!StringUtils.isEmpty(url)) {
+        } else {
         	String result = HttpClientUtil.doGet(url.toString());
         	log.info("返回结果:{}", result);
         }
