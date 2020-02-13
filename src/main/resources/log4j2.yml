@@ -46,9 +46,9 @@ Configuration:
     Console:
       name: CONSOLE
       target: SYSTEM_OUT
-      # 只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）
+      # 只输出level及其以上级别的信息（onMatch），以下级别的直接拒绝（onMismatch）
       ThresholdFilter:
-        level: INFO
+        level: TRACE
         onMatch: ACCEPT
         onMismatch: DENY
       # 日志输出格式
@@ -74,7 +74,7 @@ Configuration:
             interval: 1
           # 当文件体积大于size指定的值时，触发Rolling
           SizeBasedTriggeringPolicy:
-            size: "10 MB"
+            size: 10M
           # 程序每次启动时，Rolling
           OnStartupTriggeringPolicy:
           # 文件必定发生rollover操作的最小尺寸，默认值为1，这将阻止空文件发送rollover
@@ -99,13 +99,48 @@ Configuration:
         Filters:
             ThresholdFilter:
               -
-               level: INFO
-               onMatch: DENY
-               onMismatch: NEUTRAL
+                level: INFO
+                onMatch: DENY
+                onMismatch: NEUTRAL
               -
                 level: DEBUG
                 onMatch: ACCEPT
                 onMismatch: DENY
+
+      -
+        ####只输出 TRACE 级别日志####
+        name: TRACE
+        fileName: "${LOG_HOME}/${FILE_NAME}-TRACE.log"
+        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-TRACE-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: ${LOG_PATTERN}
+        Policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+          SizeBasedTriggeringPolicy:
+            size: 10M
+          OnStartupTriggeringPolicy:
+            minSize: 1
+        DefaultRolloverStrategy:
+          max: 30
+          Delete:
+            basePath: ${LOG_HOME}
+            maxDepth: 2
+            IfFileName:
+              glob: "*/${FILE_NAME}-TRACE-*.log.gz"
+            IfLastModified:
+              age: "60d"
+        Filters:
+            ThresholdFilter:
+              -
+                level: DEBUG
+                onMatch: DENY
+                onMismatch: NEUTRAL
+              -
+                level: TRACE
+                onMatch: ACCEPT
+                onMismatch: DENY
+
       -
         ####只输出 INFO 级别日志####
         name: INFO
@@ -117,7 +152,7 @@ Configuration:
           TimeBasedTriggeringPolicy:
             interval: 1
           SizeBasedTriggeringPolicy:
-            size: "10 MB"
+            size: 10M
           OnStartupTriggeringPolicy:
             minSize: 1
         DefaultRolloverStrategy:
@@ -132,13 +167,14 @@ Configuration:
         Filters:
             ThresholdFilter:
               -
-               level: WARN
-               onMatch: DENY
-               onMismatch: NEUTRAL
+                level: WARN
+                onMatch: DENY
+                onMismatch: NEUTRAL
               -
                 level: INFO
                 onMatch: ACCEPT
                 onMismatch: DENY
+
       -
         ####只输出 WARN 级别日志####
         name: WARN
@@ -150,7 +186,7 @@ Configuration:
           TimeBasedTriggeringPolicy:
             interval: 1
           SizeBasedTriggeringPolicy:
-            size: "10 MB"
+            size: 10M
           OnStartupTriggeringPolicy:
             minSize: 1
         DefaultRolloverStrategy:
@@ -165,13 +201,14 @@ Configuration:
         Filters:
             ThresholdFilter:
               -
-               level: WARN
+               level: ERROR
                onMatch: DENY
                onMismatch: NEUTRAL
               -
-                level: INFO
-                onMatch: ACCEPT
-                onMismatch: DENY
+               level: WARN #ACCEPT warn级别的日志 将warn级别的日志单独输出；将ERROR及其以上级别的日志给DENY掉
+               onMatch: ACCEPT
+               onMismatch: DENY
+
       -
         ####只输出 ERROR 级别日志####
         name: ERROR
@@ -183,7 +220,7 @@ Configuration:
           TimeBasedTriggeringPolicy:
             interval: 1
           SizeBasedTriggeringPolicy:
-            size: "10 MB"
+            size: 10M
           OnStartupTriggeringPolicy:
             minSize: 1
         DefaultRolloverStrategy:
@@ -197,42 +234,39 @@ Configuration:
               age: "60d"
         Filters:
             ThresholdFilter:
-              -
-               level: FATAL
-               onMatch: DENY
-               onMismatch: NEUTRAL
-              -
                 level: ERROR
                 onMatch: ACCEPT
                 onMismatch: DENY
-      -
-        ####输出level设定级别以上的日志####
-        name: ALL
-        fileName: "${LOG_HOME}/${FILE_NAME}-ALL.log"
-        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-ALL-%d{yyyy-MM-dd}-%i.log.gz"
-        PatternLayout:
-          Pattern: ${LOG_PATTERN}
-        Policies:
-          TimeBasedTriggeringPolicy:
-            interval: 1
-          SizeBasedTriggeringPolicy:
-            size: "10 MB"
-          OnStartupTriggeringPolicy:
-            minSize: 1
-        DefaultRolloverStrategy:
-          max: 30
-          Delete:
-            basePath: ${LOG_HOME}
-            maxDepth: 2
-            IfFileName:
-              glob: "*/${FILE_NAME}-ALL-*.log.gz"
-            IfLastModified:
-              age: "60d"
-        Filters:
-            ThresholdFilter:
-                level: DEBUG
-                onMatch: ACCEPT
-                onMismatch: DENY
+
+#      -
+#        ####输出level设定级别以上的日志####
+#        name: ALL
+#        fileName: "${LOG_HOME}/${FILE_NAME}-ALL.log"
+#        filePattern: "${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-ALL-%d{yyyy-MM-dd}-%i.log.gz"
+#        PatternLayout:
+#          Pattern: ${LOG_PATTERN}
+#        Policies:
+#          TimeBasedTriggeringPolicy:
+#            interval: 1
+#          SizeBasedTriggeringPolicy:
+#            size: 10M
+#          OnStartupTriggeringPolicy:
+#            minSize: 1
+#        DefaultRolloverStrategy:
+#          max: 30
+#          Delete:
+#            basePath: ${LOG_HOME}
+#            maxDepth: 2
+#            IfFileName:
+#              glob: "*/${FILE_NAME}-ALL-*.log.gz"
+#            IfLastModified:
+#              age: "60d"
+#        Filters:
+#            ThresholdFilter:
+#                level: TRACE
+#                onMatch: ACCEPT
+#                onMismatch: DENY
+
       -
         name: SOME_PACKAGE_APN
         fileName: "${LOG_HOME}/${SOME_PACKAGE}-ALL.log"
@@ -243,21 +277,21 @@ Configuration:
           TimeBasedTriggeringPolicy:
             interval: 1
           SizeBasedTriggeringPolicy:
-            size: "10 MB"
+            size: 10M
           OnStartupTriggeringPolicy:
             minSize: 1
         DefaultRolloverStrategy:
           max: 30
           Delete:
-            basePath: ${LOG_HOME}
+            basePath: ${SOME_PACKAGE}
             maxDepth: 2
             IfFileName:
-              glob: "*/${FILE_NAME}-ALL-*.log.gz"
+              glob: "*/${SOME_PACKAGE}-ALL-*.log.gz"
             IfLastModified:
               age: "60d"
         Filters:
             ThresholdFilter:
-                level: DEBUG
+                level: INFO
                 onMatch: ACCEPT
                 onMismatch: DENY
   # 定义logger
@@ -268,14 +302,22 @@ Configuration:
         ### 某包下的日志logger
         name: "${SOME_PACKAGE}"
         # 该包日志的输出级别
-        level: INFO
-        # 不继承root Logger
-        additivity: false
+        level: trace
+        # 不继承root Logger, additivity =false则不往root路径下的日志里边打印 
+        additivity: true
         # 该包日志输出目的地
         AppenderRef:
           # 引用appenders定义的appender（根据其name）
           - ref: SOME_PACKAGE_APN
           - ref: CONSOLE
+      -
+        ### mybatis
+        name: org.mybatis
+        level: trace
+      -
+        ### mybatis
+        name: com.broad.assessment.business.dao
+        level: trace
       -
         ### spring包下的日志只输出INFO级别以上
         name: org.springframework
@@ -284,11 +326,12 @@ Configuration:
         ### hibernate包下的日志只输出INFO级别以上
         name: org.hibernate
         level: INFO
+
     Root:
-      level: DEBUG
+      level: TRACE
       AppenderRef:
         - ref: CONSOLE
-        - ref: ALL
+        - ref: TRACE
         - ref: DEBUG
         - ref: INFO
         - ref: WARN
