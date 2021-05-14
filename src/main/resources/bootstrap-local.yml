@@ -14,7 +14,7 @@ spring:
 eureka:
   instance:
     prefer-ip-address: true
-    status-page-url-path: /toLogin
+    status-page-url-path: /page/index.html
   client:
     serviceUrl:
       defaultZone: http://10.200.120.48:6655/eureka/
