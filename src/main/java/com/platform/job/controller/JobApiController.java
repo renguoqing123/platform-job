@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.platform.job.api.JobApi;
 import com.platform.job.bean.SxTriggersDO;
 import com.platform.job.constants.Param;
 import com.platform.job.core.MyJob;
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-public class JobApiController {
+public class JobApiController implements JobApi{
 
 	@Autowired
 	private SxTriggersDao sxTriggersDao;
@@ -110,7 +111,7 @@ public class JobApiController {
 	}
 
 	@RequestMapping(value = "/updateJob", method = RequestMethod.POST)
-	public boolean updateJobData(@RequestBody JobDataReq req) throws SchedulerException {
+	public boolean updateJob(@RequestBody JobDataReq req) throws SchedulerException {
 		String jobName = req.getJobName();
 		String cronExpression = req.getCronExpression();
 		String url = req.getUrl();
@@ -148,8 +149,7 @@ public class JobApiController {
 	}
 
 	@RequestMapping(value = "/startJob", method = RequestMethod.GET)
-	public boolean startJob(@RequestParam String id)
-			throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public boolean startJob(@RequestParam String id) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		Optional<SxTriggersDO> opt = sxTriggersDao.findById(Long.parseLong(id));
 		SxTriggersDO dto = opt.get();
 		String jobName = dto.getJOB_NAME();

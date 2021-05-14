@@ -15,10 +15,10 @@ public interface JobApi {
 	public boolean addJob(@RequestBody JobDataReq req) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException;
 	
 	@RequestMapping(value = "/updateJob", method = RequestMethod.POST)
-	public boolean updateJobData(@RequestBody JobDataReq req) throws SchedulerException;
+	public boolean updateJob(@RequestBody JobDataReq req) throws SchedulerException;
 	
 	@RequestMapping(value = "/startJob", method = RequestMethod.GET)
-	public boolean startJob(@RequestParam String id);
+	public boolean startJob(@RequestParam String id) throws SchedulerException, ClassNotFoundException, InstantiationException, IllegalAccessException;
 	
 	@RequestMapping(value = "/stopJob", method = RequestMethod.GET)
 	public boolean stopJob(@RequestParam String id) throws SchedulerException;
