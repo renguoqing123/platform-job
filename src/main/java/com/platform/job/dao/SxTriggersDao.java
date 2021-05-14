@@ -20,8 +20,8 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 
 	@Transactional
 	@Modifying  
-	@Query(value = "UPDATE SX_TRIGGERS SET JOB_NAME=?1,DESCRIPTION=?2,CRON_EXPRESSION=?3,REQUEST_URL=?4,REQUEST_BODY=?5,REMARK=?6,MODIFY_DATE=?7,MODIFY_USER=?8 WHERE id=?9 ", nativeQuery = true)  
-	public void updateOne(String jobName, String description, String cronExpression, String url, String body, String remark, Date modifyDate,String modifyUser, Long id); 
+	@Query(value = "UPDATE SX_TRIGGERS SET JOB_NAME=?1,DESCRIPTION=?2,CRON_EXPRESSION=?3,REQUEST_URL=?4,REQUEST_BODY=?5,REMARK=?6,MODIFY_DATE=?7,MODIFY_USER=?8,JOB_START_DATE=?9,JOB_END_DATE=?10 WHERE id=?11 ", nativeQuery = true)  
+	public void updateOne(String jobName, String description, String cronExpression, String url, String body, String remark, Date modifyDate, String modifyUser, Date jobStartDate, Date jobEndDate, Long id); 
 	
 	@Transactional
 	@Modifying  
@@ -40,7 +40,7 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 	@Query(value = "SELECT DISTINCT JOB_NAME FROM SX_TRIGGERS ", nativeQuery = true)
 	public List<String> findDistinctJobList();
 	
-	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE "
+	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,REMARK,CREATE_USER,CREATE_DATE,JOB_START_DATE,JOB_END_DATE "
 			+ "FROM SX_TRIGGERS WHERE ID=?1 ", nativeQuery = true)
 	public Object findOneById(String id);
 	

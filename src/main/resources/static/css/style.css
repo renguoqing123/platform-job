@@ -33,7 +33,7 @@ color:maroon;
 } 
 .jobCla div.job, .jobCla div.group, .jobCla div.url, 
 .jobCla div.body, .jobCla div.cron, .jobCla div.desc,
-.jobCla div.remark, .jobCla div.create, .jobCla div.date { 
+.jobCla div.remark, .jobCla div.create, .jobCla div.date, .jobCla div.startDate, .jobCla div.endDate { 
 font-size:14px; 
 color:#666; 
 padding:5px 0; 

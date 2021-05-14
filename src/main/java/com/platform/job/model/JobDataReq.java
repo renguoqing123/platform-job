@@ -1,6 +1,7 @@
 package com.platform.job.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,4 +23,6 @@ public class JobDataReq implements Serializable{
 	private String remark;
 	private String createUser;
 	private String modifyUser;
+	private Date startDate;
+	private Date endDate;
 }

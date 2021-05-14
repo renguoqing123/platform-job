@@ -5,7 +5,7 @@ spring:
   application:
     name: platform-job
   datasource:
-    url: jdbc:mysql://${db.url:rm-uf6znj3x45u4no3sp.mysql.rds.aliyuncs.com}:${db.port:3306}/${server.db}?useSSL=false&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${db.url:10.200.120.45}:${db.port:3306}/${server.db}?useSSL=false&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     username: ${db.user:db_service_test}
     password: ${db.pw:Q&kUJb=U84q_}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,4 +17,4 @@ eureka:
     status-page-url-path: /toLogin
   client:
     serviceUrl:
-      defaultZone: http://localhost:5555/eureka/
+      defaultZone: http://10.200.120.48:6655/eureka/

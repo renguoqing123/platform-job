@@ -23,6 +23,10 @@ public class SxTriggersDO {
 	@Column(length = 32)
     private String JOB_GROUP;
 	@Column(length = 32)
+    private Date JOB_START_DATE;
+	@Column(length = 32)
+    private Date JOB_END_DATE;
+	@Column(length = 32)
     private String DESCRIPTION;
 	@Column(length = 32)
     private String CRON_EXPRESSION;
