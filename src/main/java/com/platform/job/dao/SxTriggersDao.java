@@ -56,6 +56,9 @@ public interface SxTriggersDao extends JpaRepository<SxTriggersDO, Long>{
 			+ "FROM SX_TRIGGERS WHERE JOB_NAME=:jobName AND JOB_GROUP=:groupName", nativeQuery = true)
 	public Page<Object[]> findByJobList(@Param("jobName") String jobName,@Param("groupName") String groupName,Pageable pageable);
 	
+	@Query(value = "SELECT ID FROM SX_TRIGGERS WHERE JOB_NAME=:jobName AND JOB_GROUP=:groupName", nativeQuery = true)
+	public Long findByJob(@Param("jobName") String jobName,@Param("groupName") String groupName);
+	
 	@Query(value = "SELECT ID,JOB_NAME,JOB_GROUP,REQUEST_URL,REQUEST_BODY,CRON_EXPRESSION,DESCRIPTION,JOB_STATUS,REMARK,CREATE_USER,CREATE_DATE "
 			+ "FROM SX_TRIGGERS", nativeQuery = true)
 	public Page<Object[]> findByJobList(Pageable pageable);

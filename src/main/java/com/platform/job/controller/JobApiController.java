@@ -249,10 +249,15 @@ public class JobApiController {
 		sxTriggersDao.deleteById(Long.parseLong(id));
 		return true;
 	}
+	
+	@RequestMapping(value = "/findJob", method = RequestMethod.GET)
+	public ResponseResult<Long> findJob(@RequestParam(value = "jobName", required = false) String jobName,
+			@RequestParam(value = "groupName", required = false) String groupName) {
+		return new ResponseResult<>(sxTriggersDao.findByJob(jobName, groupName));
+	}
 
 	@RequestMapping(value = "/queryJobTable", method = RequestMethod.GET)
-	public ResponseResult<ResultPage<List<Object[]>>> queryTable(
-			@RequestParam(value = "jobName", required = false) String jobName,
+	public ResponseResult<ResultPage<List<Object[]>>> queryTable(@RequestParam(value = "jobName", required = false) String jobName,
 			@RequestParam(value = "groupName", required = false) String groupName, @RequestParam Integer pageNum,
 			@RequestParam Integer pageSize, @RequestParam(value = "sort", required = false) String sort) {
 		List<Object[]> li = new ArrayList<>(10);
