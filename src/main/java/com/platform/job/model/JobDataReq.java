@@ -25,4 +25,5 @@ public class JobDataReq implements Serializable{
 	private String modifyUser;
 	private Date startDate;
 	private Date endDate;
+	private Integer weeks;
 }

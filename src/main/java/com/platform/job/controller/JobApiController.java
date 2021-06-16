@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.quartz.CalendarIntervalScheduleBuilder;
+import org.quartz.CalendarIntervalTrigger;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -81,6 +83,15 @@ public class JobApiController implements JobApi{
 		} else {
 			cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder)
 					.build();
+		}
+		
+		Integer weeks = req.getWeeks();
+		if(null != weeks) {
+			CalendarIntervalScheduleBuilder calendarIntervalSchedule = CalendarIntervalScheduleBuilder.calendarIntervalSchedule();
+			calendarIntervalSchedule.withIntervalInWeeks(weeks);//几周
+			CalendarIntervalTrigger intervalTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(calendarIntervalSchedule)
+					.startAt(startDate).endAt(endDate).build();
+			
 		}
 
 		// 4、job detail
